@@ -1,6 +1,16 @@
 # Data Submission
 
 PHP Form Submission to MySQL Database.
+### Requirements Met
+✅ Save 3 records into the database without duplicating the Id No. The ability to capture a duplicate Id No in the database table is an immediate fail. 
+
+✅ If a duplicate Id No is found up on capturing, the user must be informed about this and the form repopulated. People do not like to input their information in twice.
+
+✅ Validate the Id No field to make sure it is a number and that it is only 13 characters long. 
+
+✅Validate the Date of birth field to make sure that the input date is in the format dd/mm/YYYY. 
+
+✅ There must be a valid data in the name and surname fields and no characters that can cause a record not to be inputted into the database. 
 
 ## Installation
 
