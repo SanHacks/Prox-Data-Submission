@@ -1,5 +1,6 @@
 {
   "require": {
-    "": "<default>"
-  }
+
+  },
+  "readme": "README.md",
 }

@@ -1,8 +1,88 @@
 <?php
+//Check if the ID number already exists in the database
+//If it does, display an error message
+//Check if the ID number is 13 characters long
+//If it is not, display an error message
+//Check if the date of birth is in the correct format
+//If it is not, display an error message
+//Check if the name and surname contain any characters that can cause
+// a record not to be inputted into the database
 declare(strict_types=1);
+/**
+ * @return PDO
+ */
+function getPdo(): PDO
+{
+    $host = 'localhost';//Your DB host here, e.g. localhost
+    $db = 'proxserver';//Your DB name here, e.g. proxserver
+    $user = 'gundo';//Your DB username
+    $pass = '1234';//Your DB password
+    $port = "8889";//"3306"
+    $charset = 'utf8mb4';//Your DB charset, e.g. utf8mb4
+    $options = [
+        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        \PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+    $dsn = "mysql:host=$host;dbname=$db;charset=$charset;port=$port";
+    try {
+        $pdo = new \PDO($dsn, $user, $pass, $options);
+    } catch (\PDOException $e) {
+        throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    }
+    return $pdo;
+}
+
+if (isset($_POST['submit'])) {
+    $name = $_POST['name'];
+    $surname = $_POST['surname'];
+    $idNo = $_POST['id_no'];
+    $dob = $_POST['dob'];
+    $time = time();
+    $pdo = getPdo();
+
+
+    if (empty($name) || empty($surname) || empty($idNo) || empty($dob)) {
+        $errors[] = 'Please fill in all fields';
+    } else {
+        $sql = "SELECT * FROM proxserver WHERE idno = :idno";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['idno' => $idNo]);
+        $user = $stmt->fetch();
+        if ($user) {
+            $errors[] = 'ID number already exists';
+        }
+        if (strlen($idNo) != 13) {
+            $errors[] = 'ID number must be 13 characters long';
+        }
+        if (!preg_match("/^[0-9]*$/", $idNo)) {
+            $errors[] = 'ID number must be a number';
+        }
+        if (!preg_match("/^[a-zA-Z ]*$/", $name)) {
+            $errors[] = 'Name must contain letters and spaces only';
+        }
+        if (!preg_match("/^[a-zA-Z ]*$/", $surname)) {
+            $errors[] = 'Surname must contain letters and spaces only';
+        }
+        if (!preg_match("/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$/", $dob)) {
+            $errors[] = 'Date of birth must be in the format dd/mm/YYYY';
+        }
+
+
+        if (empty($errors)) {
+            $sql = "INSERT INTO `proxserver` (`name`, `surname`, `idno`, `dob`, `timeOfSign`) VALUES (:name,
+                 :surname, :idno, :dob, :timeOfSign)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['name' => $name, 'surname' => $surname, 'idNo' => $idNo, 'dob' => $dob,
+                'timeOfSign' => $time]);
+            $success = 'Record saved successfully';
+            header('Location: index.php?success=' . $success);
+        }
+        }
+}
+
 
 ?>
-
 <!--Create an HTML form with the following input fields to allow for the capturing of
 data into a database:
 Name, Surname, Id No, Date of Birth, POST button, CANCEL button
@@ -19,6 +99,7 @@ characters long.
 format dd/mm/YYYY.
 • There must be a valid data in the name and surname fields and no characters
 that can cause a record not to be inputted into the database.-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,7 +116,8 @@ that can cause a record not to be inputted into the database.-->
     <script src="https://kit.fontawesome.com/6680624b05.js" crossorigin="anonymous"></script>
     <!--import jquery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <meta name="description" content="ProxServer , Save: Name, Surname, Id No, Date of Birth, POST button, CANCEL button">
+    <meta name="description" content="ProxServer , Save: Name, Surname, Id No, Date of Birth,
+     POST button, CANCEL button">
     <meta name="keywords" content="Whatsapp, Manager, WhatsappMan">
     <meta name="author" content="Gundo">
     <meta name="robots" content="index, follow">
@@ -53,23 +135,7 @@ that can cause a record not to be inputted into the database.-->
 </head>
 
 <body>
-<!-- navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="index.php">ProxServer</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav ml-auto">
-            <a class="nav-item nav-link active" href="index.php">Home <span class="sr-only">(current)</span></a>
-            <a class="nav-item nav-link" href="#">About</a>
-            <a class="nav-item nav-link" href="#">Contact</a>
-            <a class="nav-item nav-link" href="#">Sign Up</a>
-            <a class="nav-item nav-link" href="#">Login</a>
-        </div>
-    </div>
-</nav>
-<!-- end navbar -->
+<?php include_once "includes/navbar.php"; ?>
 
 <!-- jumbotron -->
 <div class="container">
@@ -80,11 +146,35 @@ that can cause a record not to be inputted into the database.-->
                 <p class="lead">PHP Proficiency Test</p>
                 <hr class="my-4">
                 <p>"Talk Is Cheap, Show Me The Code..."</p>
-                <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+                <a class="btn btn-primary btn-lg" href="http://gundo.ml" target="_blank" role="button">Learn more</a>
             </div>
         </div>
     </div>
 </div>
+<?php if (isset($_GET['success'])): ?>
+
+<div class="alert alert-success">
+    <?php echo $_GET['success']; ?>
+    <?php unset($_GET['success']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['error'])): ?>
+    <div class="alert alert-danger">
+        <?php echo $_GET['error']; ?>
+        <?php unset($_GET['error']); ?>
+        <?php endif; ?>
+        <?php if (isset($errors)): ?>
+        <div class="alert alert-danger">
+            <?php foreach ($errors as $error): ?>
+             <li><?php echo $error; ?></li>
+            <?php endforeach; ?>
+            <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <div class="container">
     <div class="row">
@@ -92,39 +182,55 @@ that can cause a record not to be inputted into the database.-->
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
+
                     <h3 class="text-center">Sign Up</h3>
                 </div>
+
+                    </div>
                 <div class="card-body">
-                    <form action="signup.php" method="post">
+                   <!--- Name, Surname, Id No, Date of Birth, POST button, CANCEL button -->
+
+                    <form action="index.php" method="post" class="form form-group form-control form-control-lg">
                         <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name"
+                            <?php if (isset($_POST['name'])): ?>
+                                value="<?php echo $_POST['name']; ?>"
+                            <?php endif; ?>
+                            >
                         </div>
-                        <div class="form-group mt-3">
-                            <label for="email">Email</label>
-                            <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email">
+                        <div class="form-group">
+                            <label for="name">Surname</label>
+                            <input type="text" name="surname" id="surname" class="form-control"
+                                   placeholder="Enter your Surname"
+                            <?php if (isset($_POST['surname'])): ?>
+                                value="<?php echo $_POST['surname']; ?>"
+                            <?php endif; ?>
+                            >
                         </div>
-                        <div class="form-group mt-3">
-                            <label for="whatsapp">Whatsapp Number</label>
-                            <input type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Enter your whatsapp number">
+                        <div class="form-group">
+                            <label for="name">Id No</label>
+                            <input type="number" name="id_no" id="id_no" class="form-control"
+                                   placeholder="Enter your Id No"
+                            <?php if (isset($_POST['id_no'])): ?>
+                                value="<?php echo $_POST['id_no']; ?>"
+                            <?php endif; ?>
+                            >
                         </div>
-                        <div class="form-group mt-3">
-                            <label for="business">Business Name</label>
-                            <input type="text" name="business" id="business" class="form-control" placeholder="Enter your business name">
+                        <div class="form-group">
+                            <label for="name">Date of Birth</label>
+                            <input type="date" placeholder="dd-mm-yyyy" value=""
+                                   min="1960-01-01" max="2030-12-31" name="dob" id="dob" class="form-control"
+                            <?php if (isset($_POST['dob'])): ?>
+                                value="<?php echo $_POST['dob']; ?>"
+                            <?php endif; ?>
+                            >
                         </div>
 
                         <div class="form-group mt-3">
-                            <label for="password">Password</label>
-                            <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password">
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label for="confirm_password">Confirm Password</label>
-                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Confirm your password">
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                            <button type="submit" name="submit" id="submit" class="btn btn-primary
+                            btn-block">Post</button>
+                            <button type="reset" class="btn btn-danger btn-block">Cancel</button>
                         </div>
 
                     </form>
@@ -138,7 +244,7 @@ that can cause a record not to be inputted into the database.-->
 <!-- end sign up form -->
 
 <!-- footer -->
-<?php include 'footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>
 <!-- end footer -->
 
 </body>
