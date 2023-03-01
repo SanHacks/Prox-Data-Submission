@@ -1,6 +1,7 @@
 # Data Submission
 
 PHP Form Submission to MySQL Database.
+<img width="1440" alt="Screenshot 2023-03-02 at 01 01 49" src="https://user-images.githubusercontent.com/13138647/222286631-8f26a5c2-999a-44a3-8e30-630516258020.png">
 
 ## Installation
 
