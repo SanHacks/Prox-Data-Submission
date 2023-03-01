@@ -11,6 +11,7 @@ PHP Form Submission to MySQL Database.
 ✅Validate the Date of birth field to make sure that the input date is in the format dd/mm/YYYY. 
 
 ✅ There must be a valid data in the name and surname fields and no characters that can cause a record not to be inputted into the database. 
+<img width="1440" alt="Screenshot 2023-03-02 at 01 01 49" src="https://user-images.githubusercontent.com/13138647/222286631-8f26a5c2-999a-44a3-8e30-630516258020.png">
 
 ## Installation
 
@@ -48,6 +49,8 @@ PHP Form Submission to MySQL Database.
 
 6. If you already have Mysql and PHP separately in your machine, you may type the following command in the terminal to run the php native server.
    - `php -S localhost:8000`
+   <img width="1423" alt="Screenshot 2023-03-02 at 00 51 43" src="https://user-images.githubusercontent.com/13138647/222286796-62edfab1-8005-4a80-aefe-cccf14e1c0ae.png">
+
    - Open the following url in your browser. `http://localhost:8000/ProxServer/` or `http://localhost:8000/ProxServer/index.php`
    
 ## Usage
