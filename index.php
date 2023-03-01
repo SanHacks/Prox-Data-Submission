@@ -33,6 +33,40 @@ function getPdo(): PDO
     return $pdo;
 }
 
+/**
+ * @param PDO $pdo
+ * @param $name
+ * @param $surname
+ * @param $idNo
+ * @param $dob
+ * @param int $time
+ * @return void
+ */
+function saveData(PDO $pdo, $name, $surname, $idNo, $dob, int $time): void
+{
+    $sql = "INSERT INTO `proxserver` (`name`, `surname`, `idno`, `dob`, `timeOfSign`) VALUES (:name,
+                 :surname, :idno, :dob, :timeOfSign)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['name' => $name, 'surname' => $surname, 'idno' => $idNo, 'dob' => $dob,
+        'timeOfSign' => $time]);
+    $success = 'Record saved successfully';
+    header('Location: index.php?success=' . $success);
+}
+
+/**
+ * @param PDO $pdo
+ * @param $idNo
+ * @return mixed
+ */
+function checkForID(PDO $pdo, $idNo)
+{
+    $sql = "SELECT * FROM proxserver WHERE idno = :idno";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['idno' => $idNo]);
+    $user = $stmt->fetch();
+    return $user;
+}
+
 if (isset($_POST['submit'])) {
     $name = $_POST['name'];
     $surname = $_POST['surname'];
@@ -45,66 +79,67 @@ if (isset($_POST['submit'])) {
     if (empty($name) || empty($surname) || empty($idNo) || empty($dob)) {
         $errors[] = 'Please fill in all fields';
     } else {
-        $sql = "SELECT * FROM proxserver WHERE idno = :idno";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['idno' => $idNo]);
-        $user = $stmt->fetch();
+        //Check if the ID number already exists in the database
+        $user = checkForID($pdo, $idNo);
+
         if ($user) {
             $errors[] = 'ID number already exists';
         }
+        /* Check if the ID number is 13 characters long
+        by checking the length of the string
+        If it is not, display an error message*/
         if (strlen($idNo) != 13) {
             $errors[] = 'ID number must be 13 characters long';
         }
+        /*
+         ^ = start of the string
+        [0-9] = any number between 0 and 9
+        * = the number can be repeated any number of times
+          $ = end of the string
+         */
         if (!preg_match("/^[0-9]*$/", $idNo)) {
             $errors[] = 'ID number must be a number';
         }
+        /*        ^ = start of the string
+        [a-zA-Z] = any letter between a and z or A and Z
+        * = the letter can be repeated any number of times
+        $ = end of the string
+        */
         if (!preg_match("/^[a-zA-Z ]*$/", $name)) {
             $errors[] = 'Name must contain letters and spaces only';
         }
+        /*^ = start of the string
+        [a-zA-Z] = any letter between a and z
+        * = the letter can be repeated any number of times
+        $ = end of the string (i.e. the string must end with a letter)*/
         if (!preg_match("/^[a-zA-Z ]*$/", $surname)) {
             $errors[] = 'Surname must contain letters and spaces only';
         }
+
+       /* ^ = start of the string
+        [0-9] = any number between 0 and 9
+        {2} = the number must be repeated 2 times
+        \/ = a forward slash
+        $ = end of the string*/
         if (!preg_match("/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$/", $dob)) {
             $errors[] = 'Date of birth must be in the format dd/mm/YYYY';
         }
 
-
         if (empty($errors)) {
-            $sql = "INSERT INTO `proxserver` (`name`, `surname`, `idno`, `dob`, `timeOfSign`) VALUES (:name,
-                 :surname, :idno, :dob, :timeOfSign)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute(['name' => $name, 'surname' => $surname, 'idno' => $idNo, 'dob' => $dob,
-                'timeOfSign' => $time]);
-            $success = 'Record saved successfully';
-            header('Location: index.php?success=' . $success);
-        }
+            saveData($pdo, $name, $surname, $idNo, $dob, $time);
+            }
         }
 }
 
 
 ?>
-<!--Create an HTML form with the following input fields to allow for the capturing of
-data into a database:
-Name, Surname, Id No, Date of Birth, POST button, CANCEL button
-Create a database with a relevant schema to store the input fields in.
-REQUIREMENTS:
-• Save 3 records into the database without duplicating the Id No. The ability to
-capture a duplicate Id No in the database table is an immediate fail.
-• If a duplicate Id No is found up on capturing, the user must be informed about
-this and the form repopulated. People do not like to input their information in
-twice.
-• Validate the Id No field to make sure it is a number and that it is only 13
-characters long.
-• Validate the Date of birth field to make sure that the input date is in the
-format dd/mm/YYYY.
-• There must be a valid data in the name and surname fields and no characters
-that can cause a record not to be inputted into the database.-->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>ProxServer</title>
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-grid.css">
@@ -112,21 +147,26 @@ that can cause a record not to be inputted into the database.-->
     <link rel="stylesheet" href="css/bootstrap-reboot.css">
     <link rel="stylesheet" href="css/bootstrap-reboot.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <!--import fancy icons -->
-    <script src="https://kit.fontawesome.com/6680624b05.js" crossorigin="anonymous"></script>
-    <!--import jquery -->
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <meta name="description" content="ProxServer , Save: Name, Surname, Id No, Date of Birth,
      POST button, CANCEL button">
-    <meta name="keywords" content="Whatsapp, Manager, WhatsappMan">
-    <meta name="author" content="Gundo">
+    <meta name="keywords" content="ProxServer, Name, Surname, Id No, Date of Birth, POST button, CANCEL button, WhatsappMan">
+    <meta name="author" content="Gundo San Sifhufhi">
+    <!-- BOTS -->
     <meta name="robots" content="index, follow">
     <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+
+    <!-- Mobile Specific Metas -->
     <meta name="language" content="English">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Browser Specific Metas -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-Language" content="en">
@@ -172,9 +212,6 @@ that can cause a record not to be inputted into the database.-->
             </div>
         </div>
     </div>
-</div>
-
-
 
 <div class="container">
     <div class="row">
@@ -183,13 +220,12 @@ that can cause a record not to be inputted into the database.-->
             <div class="card">
                 <div class="card-header">
 
-                    <h3 class="text-center">Sign Up</h3>
+                    <h3 class="text-center">Data Submission</h3>
                 </div>
 
                     </div>
                 <div class="card-body">
                    <!--- Name, Surname, Id No, Date of Birth, POST button, CANCEL button -->
-
                     <form action="index.php" method="post" class="form form-group form-control form-control-lg">
                         <div class="form-group">
                             <label for="name">Name</label>
@@ -219,7 +255,7 @@ that can cause a record not to be inputted into the database.-->
                         </div>
                         <div class="form-group">
                             <label for="name">Date of Birth</label>
-                            <p style="tex-align: center; color: red; font-size: x-small">Please enter your date of birth
+                            <p style="tex-align: center; color: #398948; font-size: x-small">Please enter your date of birth
                                 in the format
                                 "DDMMYYYY"</p>
                             <input type="text" id="dob" name="dob" pattern="\d{2}\d{2}\d{4\}" required

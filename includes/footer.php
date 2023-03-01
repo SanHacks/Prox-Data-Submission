@@ -1,4 +1,20 @@
-<footer>
+<footer style="padding-top: 20px; padding-bottom: 20px; background-color: #f8f9fa; color: #6c757d; font-size: 14px; font-weight: 400; line-height: 1.5; text-align: center;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+          <p>Made with ❤️</i> </p>
+        </div>
+        <div class="col-md-4">
+          <p>2023</p>
+        </div>
+        <div class="col-md-4">
+          <a href="http://gundo.ml" target="_blank" <p>SanHacks</p>
+        </div>
+        </div>
+        </div>
+
+
+
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iE
     jwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJo
