@@ -49,7 +49,7 @@ PHP Form Submission to MySQL Database.
 
 6. If you already have Mysql and PHP separately in your machine, you may type the following command in the terminal to run the php native server.
    - `php -S localhost:8000`
-   <img width="1423" alt="Screenshot 2023-03-02 at 00 51 43" src="https://user-images.githubusercontent.com/13138647/222286796-62edfab1-8005-4a80-aefe-cccf14e1c0ae.png">
+  ![image](https://user-images.githubusercontent.com/13138647/222289537-5f43dcdc-1410-4495-bccb-429cc1c4da24.png)
 
    - Open the following url in your browser. `http://localhost:8000/ProxServer/` or `http://localhost:8000/ProxServer/index.php`
    
