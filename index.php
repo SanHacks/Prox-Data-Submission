@@ -73,7 +73,7 @@ if (isset($_POST['submit'])) {
             $sql = "INSERT INTO `proxserver` (`name`, `surname`, `idno`, `dob`, `timeOfSign`) VALUES (:name,
                  :surname, :idno, :dob, :timeOfSign)";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute(['name' => $name, 'surname' => $surname, 'idNo' => $idNo, 'dob' => $dob,
+            $stmt->execute(['name' => $name, 'surname' => $surname, 'idno' => $idNo, 'dob' => $dob,
                 'timeOfSign' => $time]);
             $success = 'Record saved successfully';
             header('Location: index.php?success=' . $success);
@@ -219,8 +219,11 @@ that can cause a record not to be inputted into the database.-->
                         </div>
                         <div class="form-group">
                             <label for="name">Date of Birth</label>
-                            <input type="date" placeholder="dd-mm-yyyy" value=""
-                                   min="1960-01-01" max="2030-12-31" name="dob" id="dob" class="form-control"
+                            <p style="tex-align: center; color: red; font-size: x-small">Please enter your date of birth
+                                in the format
+                                "DDMMYYYY"</p>
+                            <input type="text" id="dob" name="dob" pattern="\d{2}\d{2}\d{4\}" required
+                                   placeholder="DD/MM/YY" class="form-control"
                             <?php if (isset($_POST['dob'])): ?>
                                 value="<?php echo $_POST['dob']; ?>"
                             <?php endif; ?>
