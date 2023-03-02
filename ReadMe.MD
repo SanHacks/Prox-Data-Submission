@@ -23,7 +23,9 @@ PHP Form Submission to MySQL Database.
    - If you are using MAMP, copy the source to htdocs folder. ` /Applications/MAMP/htdocs/`
    - If you are using any other server, copy the source to the root folder.
      _(Assuming that the installer has already configured the server or a server)_
-
+    
+    OR Alternatively, Dockerize the application. by running the following command in the terminal.
+    - `docker-compose up -d`
 3. Create a database named "ProxServer" and import the PROJECT_DIR/`DB/ProxServer.sql` file to the database.
 
    `CREATE TABLE IF NOT EXISTS ...`

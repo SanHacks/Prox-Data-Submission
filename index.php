@@ -250,7 +250,7 @@ if (isset($_POST['submit'])) {
                             <label for="name">Date of Birth</label>
                             <p style="tex-align: center; color: #398948; font-size: x-small">Please enter your date of birth
                                 in the format
-                                "DDMMYYYY"</p>
+                                "DD/MM/YYYY"</p>
                             <input type="text" id="dob" name="dob" pattern="\d{2}\d{2}\d{4\}" required
                                    placeholder="DD/MM/YY" class="form-control"
                             <?php if (isset($_POST['dob'])): ?>
