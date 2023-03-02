@@ -1,13 +1,7 @@
 <?php
-//Check if the ID number already exists in the database
-//If it does, display an error message
-//Check if the ID number is 13 characters long
-//If it is not, display an error message
-//Check if the date of birth is in the correct format
-//If it is not, display an error message
-//Check if the name and surname contain any characters that can cause
-// a record not to be inputted into the database
+
 declare(strict_types=1);
+
 /**
  * @return PDO
  */
@@ -63,8 +57,7 @@ function checkForID(PDO $pdo, $idNo)
     $sql = "SELECT * FROM proxserver WHERE idno = :idno";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['idno' => $idNo]);
-    $user = $stmt->fetch();
-    return $user;
+    return $stmt->fetch();
 }
 
 if (isset($_POST['submit'])) {
@@ -279,12 +272,6 @@ if (isset($_POST['submit'])) {
         <div class="col-md-4"></div>
     </div>
 </div>
-
-<!-- end sign up form -->
-
-<!-- footer -->
 <?php include_once 'includes/footer.php'; ?>
-<!-- end footer -->
-
 </body>
 </html>
